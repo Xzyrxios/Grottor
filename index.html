@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Koordinatspårning</title>
+  <title>The World's Best Cave Exploring App</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     body { margin: 0; font-family: sans-serif; }
@@ -12,210 +12,202 @@
     .visited { background-color: green; color: white; }
     .popup-content button { margin-top: 0.5em; }
     .navigate-link { display: inline-block; margin-top: 0.5em; color: #0645AD; text-decoration: underline; }
+    #marker-list { padding: 0.5em 1em 1em 1cm; margin-left: 1cm; list-style-type: none; max-width: 600px; font-size: 0.95em; }
   </style>
 </head>
 <body>
 
 <div id="map"></div>
 
-<div id="info">
+<div id="info" style="margin-bottom: 0.25em;">
   <h4>ℹ️ Info</h4>
-  <p>Det här är världens bästa grottutforskar-app!</p>
+  <p style="margin-bottom: 0.25em;">Det här är världens bästa grottutforskar-app!</p>
 </div>
 
-<div style="padding: 1em; margin-left: 1cm;">
+<div style="padding: 1em; margin-left: 1cm; display: flex; gap: 1em; align-items: center; max-width: 600px;">
   <button onclick="centerOnUser()">Centrera på min plats</button>
+  <button onclick="resetMarkers()">Återställ platser</button>
+</div>
+<br/>
+<div style="padding: 0 1em 0em 1cm; max-width: 600px;">
+  <label for="filter">Visa:
+    <select id="filter" onchange="applyFilter()">
+      <option value="all">Alla</option>
+      <option value="visited">Besökta</option>
+      <option value="notvisited">Ej besökta</option>
+    </select>
+  </label>
 </div>
 
-<ul id="marker-list" style="padding: 1em; margin-left: 1cm; list-style-type: none;"></ul>
+<ul id="marker-list"></ul>
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  const map = L.map('map').setView([60.3755, 16.0244], 10);
+const map = L.map('map').setView([60.3755, 16.0244], 10);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+const defaultMarkers = [
+  { id: 1, name: "UFO-grottan i Aspberget", lat: 60.37551, lng: 16.02445, visited: false, location: "Aspberget, Hedemora", description: "Tips om en sprickgrotta i Aspberget, 12 km N Hedemora och 2 km SO Husby kyrka. Grottan ligger troligen i bergets ostbrant.", history: "" },
+  { id: 2, name: "Grottan i Humboberget", lat: 60.2152, lng: 15.4600, visited: false, location: "I Humboberget drygt 3 km S om Norrbärke Kyrka", description: "Berget innehåller gamla gruvhål. 'Grottan' kanske är ett gammalt gruvhål?", history: "" },
+  { id: 3, name: "Skelettgrottan", lat: 60.3100, lng: 15.0000, visited: false, location: "Nära Pershyttan och Nordansjö, N om Hedemora", description: "", history: "" },
+  { id: 4, name: "Grottan i Flogberget", lat: 60.2440, lng: 15.1420, visited: false, location: "Vid sjön Plogen, 500 m N Flogbergsgruvorna, 3.5 km V Morgårdshammar", description: "", history: "" },
+  { id: 5, name: "Grottan i Ångermansboklinten", lat: 60.4950, lng: 15.6820, visited: false, location: "I berget väster om Ångermansbosjön", description: "\"I själva berget gömmer sig en grotta med släta och lodräta väggar\".", history: "" },
+  { id: 6, name: "Gunnars Hålorna", lat: 60.3180, lng: 15.7730, visited: false, location: "Södra sidan av Kälsjön, nära Kärrsjön och Kärrsjöberget", description: "De två hålorna eller grottorna finns i berget på södra sidan av Kälsjön - skall förmodligen vara den på kartan namngivna Kärrsjön och berget Kärrsjöberget.", history: "En gissning till namnet Gunnars hålorna är att det kommer från en fredlös man vid namn Gunnar som här sökt skydd undan sina förföljare." },
+  { id: 7, name: "Grottan i Helgeberget", lat: 60.3550, lng: 15.6600, visited: false, location: "Nära Västanberg (möjligen Hällbergsklack)", description: "Vid Helgebergets fot finns en djup grotta som går in under berget.", history: "" },
+  { id: 8, name: "Storpusskyrkan", lat: 60.3085, lng: 15.6200, visited: false, location: "Mellan Lövåsberget och Högsvedsberget, nära Arkhyttan", description: "Enligt RAA är detta ett 9 m långt flyttblock, 4 m högt, som vilar på ett mindre sprucket block. Under det stora blockets NO-del har ett rum i manshöjd bildats.", history: "" }
+];
+let markers = JSON.parse(localStorage.getItem('markers')) || [...defaultMarkers];
 
-  const markers = [
-    {
-      id: 1,
-      name: "UFO-grottan i Aspberget",
-      lat: 60.37551,
-      lng: 16.02445,
-      visited: false,
-      location: "Aspberget, Hedemora",
-      description: "Tips om en sprickgrotta i Aspberget, 12 km N Hedemora och 2 km SO Husby kyrka. Grottan ligger troligen i bergets ostbrant. Möjligen är detta tips samma grotta som riks-nr 3743 Jättens stuga, som ligger i södra sidan av Aspberget.",
-      history: ""
-    },
-    {
-      id: 2,
-      name: "Gunnars Hålorna",
-      lat: 60.18398,
-      lng: 16.18357,
-      visited: false,
-      location: "Södra sidan av Kälsjön, nära Kärrsjön och Kärrsjöberget",
-      description: "De två hålorna eller grottorna finns i berget på södra sidan av Kälsjön - skall förmodligen vara den på kartan namngivna Kärrsjön och berget Kärrsjöberget.",
-      history: "En gissning till namnet Gunnars hålorna är att det kommer från en fredlös man vid namn Gunnar som här sökt skydd undan sina förföljare."
-    },
-    {
-      id: 3,
-      name: "Grottan i Hummelberget",
-      lat: 60.43385,
-      lng: 14.09801,
-      visited: false,
-      location: "Hummelberget, 2 km SV om Dalälven, 8 km SO om Äppelbo",
-      description: "(grottbeskrivning saknas)",
-      history: ""
-    },
-    {
-      id: 4,
-      name: "Grottan i Humboberget",
-      lat: 60.11212,
-      lng: 15.40952,
-      visited: false,
-      location: "I Humboberget drygt 3 km S om Norrbärke Kyrka",
-      description: "Berget innehåller gamla gruvhål. \"Grottan\" kanske är ett gammalt gruvhål?",
-      history: ""
-    },
-    {
-      id: 5,
-      name: "Grottan i Ångermansboklinten",
-      lat: 60.12925,
-      lng: 16.41684,
-      visited: false,
-      location: "I berget väster om Ångermansbosjön",
-      description: "\"I själva berget gömmer sig en grotta med släta och lodräta väggar\".",
-      history: ""
-    },
-    {
-      id: 6,
-      name: "Grottan i Helgeberget",
-      lat: 60.22875,
-      lng: 16.22018,
-      visited: false,
-      location: "Helgeberget i närheten av Västanberg",
-      description: "\"Vid Helgebergets fot finns en djup grotta som går in under berget\".",
-      history: ""
-    },
-    {
-      id: 7,
-      name: "Grottan i Flogberget",
-      lat: 60.15844,
-      lng: 15.30632,
-      visited: false,
-      location: "Vid sjön Plogen, 500 m N Flogbergsgruvorna, 3.5 km V Morgårdshammar",
-      description: "(grottbeskrivning saknas)",
-      history: ""
-    },
-    {
-      id: 8,
-      name: "Skelettgrottan",
-      lat: 60.34601,
-      lng: 15.93189,
-      visited: false,
-      location: "Nära Pershyttan och Nordansjö, N om Hedemora",
-      description: "(grottbeskrivning saknas)",
-      history: ""
-    },
-    {
-      id: 9,
-      name: "Trolldörren",
-      lat: 60.11639,
-      lng: 15.01635,
-      visited: false,
-      location: "Nära Låsberget, ca 2 km SO om Grytängbodarna och 4 km SV om Sunnansjö",
-      description: "Trolldörren är ett stort stenblock med en grotta innanför.",
-      history: "Trollen sägs ha bott där."
-    },
-    {
-      id: 10,
-      name: "Storpusskyrkan",
-      lat: 60.44044,
-      lng: 15.72725,
-      visited: false,
-      location: "Mellan Lövåsberget och Högsvedsberget, nära Arkhyttan och Stora Skedvi",
-      description: "Enligt RAA är detta ett 9 m långt flyttblock, 4 m högt, som vilar på ett mindre sprucket block. Under det stora blockets NO-del har ett rum i manshöjd bildats.",
-      history: ""
+function resetMarkers() {
+  if (!confirm('Vill du återställa dina besökta platser?\nSidan laddas om.')) return;
+  localStorage.removeItem('markers');
+  document.getElementById('filter').value = 'all';
+  showSnackbar('Platser återställda');
+  setTimeout(() => location.reload(), 1500);
+}
+
+function saveMarkers() {
+  localStorage.setItem('markers', JSON.stringify(markers));
+}
+
+function markVisited(id) {
+  const marker = markers.find(m => m.id === id);
+  if (marker) {
+    marker.visited = !marker.visited;
+    saveMarkers();
+    applyFilter();
+  }
+}
+
+function renderMarkers(filter = 'all') {
+  map.eachLayer(layer => {
+    if (layer instanceof L.Marker && !layer._isUserMarker) {
+      map.removeLayer(layer);
     }
-  ];
+  });
+  let filtered = markers;
+  if (filter === 'visited') filtered = markers.filter(m => m.visited);
+  if (filter === 'notvisited') filtered = markers.filter(m => !m.visited);
+  filtered.forEach(m => {
+    const iconColor = m.visited ? 'green' : 'blue';
+    const marker = L.marker([m.lat, m.lng], {
+      icon: L.icon({
+        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${iconColor}.png`,
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      })
+    }).addTo(map);
+    marker._isUserMarker = false;
+    const gmapsLink = `https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}`;
+    const popupHtml = `
+      <div class="popup-content">
+        <b>${m.name}</b><br/>
+        <small style='color: #555;'>${m.location || ''}</small><br/>
+        <p>${m.description || ''}</p>
+        ${m.history ? `<em>${m.history}</em><br/>` : ''}
+        <button onclick="markVisited(${m.id})" class="${m.visited ? 'visited' : ''}">
+          ${m.visited ? 'Besökt' : 'Markera som besökt'}</button><br/>
+        <a href="${gmapsLink}" target="_blank" class="navigate-link">Navigera till platsen</a>
+      </div>`;
+    marker.bindPopup(popupHtml);
+  });
+}
 
-  function saveMarkers() {
-    localStorage.setItem('markers', JSON.stringify(markers));
-  }
-
-  function renderMarkers() {
-    markers.forEach(m => {
-      const iconColor = (!m.description || m.description.toLowerCase().includes('saknas')) ? 'default' : 'green';
-      const marker = L.marker([m.lat, m.lng], {
-        icon: L.icon({
-          iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${iconColor === 'default' ? 'blue' : iconColor}.png`,
-          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41]
-        })
-      }).addTo(map);
-      const gmapsLink = `https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}`;
-      const popupHtml = `
-        <div class="popup-content">
-          <b>${m.name}</b><br/>
-          <small>${m.location || ''}</small><br/>
-          <p>${m.description || ''}</p>
-          ${m.history ? `<em>${m.history}</em><br/>` : ''}
-          <button onclick="markVisited(${m.id})" class="${m.visited ? 'visited' : ''}">
-            ${m.visited ? 'Besökt' : 'Markera som besökt'}</button><br/>
-          <a href="${gmapsLink}" target="_blank" class="navigate-link">Navigera till platsen</a>
-        </div>`;
-      marker.bindPopup(popupHtml);
-    });
-  }
-
-  function markVisited(id) {
-    const marker = markers.find(m => m.id === id);
-    if (marker) {
-      marker.visited = !marker.visited;
-      saveMarkers();
-      location.reload();
-    }
-  }
-
-  renderMarkers();
-
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(pos => {
-      const userLat = pos.coords.latitude;
-      const userLng = pos.coords.longitude;
-      const userMarker = L.circleMarker([userLat, userLng], {
-        radius: 7,
-        color: '#3388ff',
-        fillColor: '#3388ff',
-        fillOpacity: 1
-      }).addTo(map).bindPopup("Du är här");
-      window.__userLatLng = [userLat, userLng];
-    });
-  }
-
-  function centerOnUser() {
-    if (window.__userLatLng) {
-      map.setView(window.__userLatLng, 13);
-    } else {
-      alert('Platsdata inte tillgänglig ännu. Tillåt platstjänster eller försök igen.');
-    }
-  }
+function renderList(sortedMarkers) {
   const list = document.getElementById('marker-list');
-  markers.forEach(m => {
+  if (!list) return;
+  list.innerHTML = '';
+  const distMap = Object.fromEntries(sortedMarkers.map(m => [m.id, m.dist || null]));
+  const sorted = [...sortedMarkers].sort((a, b) => (a.dist || Infinity) - (b.dist || Infinity));
+  sorted.forEach(m => {
+    const dist = distMap[m.id];
     const li = document.createElement('li');
-    li.innerHTML = `<strong style='color: #0645AD;'>${m.name}</strong><br/>
+    const distance = dist ? ` (${(dist * 111).toFixed(1)} km)` : '';
+    const visitedText = m.visited ? '<span style="color:green;">Besökt: Ja</span>' : '<span style="color:gray;">Besökt: Nej</span>';
+    li.innerHTML = `<strong style='color: #0645AD;'>${m.name}${distance}</strong> ${visitedText}<br/>
       <small>${m.location || ''}</small><br/>
-      ${m.description && !m.description.toLowerCase().includes('saknas') ? `<p>${m.description}</p>` : '<em>(saknar beskrivning)</em>'}
-      ${m.history ? `<em>${m.history}</em>` : ''}<hr/>`;
+      ${m.description ? `<p>${m.description}</p>` : '<em style="font-size: 0.75em; color: #888;">(saknar beskrivning)</em>'}
+      ${m.history ? `<em>${m.history}</em><br/>` : ''}
+      <hr/>`;
     li.style.cursor = 'pointer';
     li.addEventListener('click', () => {
-      map.setView([m.lat, m.lng], 14);
+      const isActive = li.style.backgroundColor === 'lightyellow';
+      document.querySelectorAll('#marker-list li').forEach(el => el.style.backgroundColor = '');
+      if (!isActive) {
+        li.style.backgroundColor = 'lightyellow';
+        map.setView([m.lat, m.lng], 14);
+      }
     });
     list.appendChild(li);
   });
+}
+
+function applyFilter() {
+  const filter = document.getElementById('filter').value;
+  let filtered = markers;
+  if (filter === 'visited') filtered = markers.filter(m => m.visited);
+  if (filter === 'notvisited') filtered = markers.filter(m => !m.visited);
+
+  let withDist = filtered.map(m => ({ ...m, dist: null }));
+
+  if (window.__userLatLng) {
+    const [userLat, userLng] = window.__userLatLng;
+    withDist = filtered.map(m => {
+      const dx = m.lat - userLat;
+      const dy = m.lng - userLng;
+      return { ...m, dist: Math.sqrt(dx * dx + dy * dy) };
+    }).sort((a, b) => a.dist - b.dist);
+  }
+
+  renderMarkers(filter);
+  renderList(withDist);
+}
+
+function centerOnUser() {
+  if (window.__userLatLng) {
+    map.setView(window.__userLatLng, 13);
+  } else {
+    alert('Platsdata inte tillgänglig ännu. Tillåt platstjänster eller försök igen.');
+  }
+}
+
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(pos => {
+    const userLat = pos.coords.latitude;
+    const userLng = pos.coords.longitude;
+    const userMarker = L.circleMarker([userLat, userLng], {
+      radius: 7,
+      color: '#3388ff',
+      fillColor: '#3388ff',
+      fillOpacity: 1
+    }).addTo(map).bindPopup("Du är här");
+    userMarker._isUserMarker = true;
+    window.__userLatLng = [userLat, userLng];
+    applyFilter();
+  }, () => {
+    applyFilter();
+  });
+} else {
+  applyFilter();
+}
+
+function showSnackbar(msg) {
+  let bar = document.getElementById('snackbar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'snackbar';
+    bar.style = 'display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:white; padding:10px 20px; border-radius:5px; font-size:0.9em; z-index:1000;';
+    document.body.appendChild(bar);
+  }
+  bar.textContent = msg;
+  bar.style.display = 'block';
+  setTimeout(() => bar.style.display = 'none', 2000);
+}
 </script>
 
 </body>
