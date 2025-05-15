@@ -25,5 +25,14 @@
     "visited": false,
     "location": "Pershyttan och Nordansjö, N om Hedemora",
     "description": "En liten grotta med historia som är värd att utforska."
+  },
+  {
+    "id": 4,
+    "name": "Per Gynts Grotta",
+    "lat": 60.54288807138885,
+    "lng": 15.35887630731286,
+    "visited": false,
+    "location": "Norr Amsberg, Borlänge",
+    "description": "En grotta med en kuslig historia. Stråtrövaren Per Gynt sägs ha bott här tillsammans med en orm och en varg."
   }
 ]
