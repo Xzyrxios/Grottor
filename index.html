@@ -213,7 +213,8 @@ function showSnackbar(msg) {
   if (!bar) {
     bar = document.createElement('div');
     bar.id = 'snackbar';
-    bar.style = 'display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:white; padding:10px 20px; border-radius:5px; font-size:0.9em; z-index:1000;';    document.body.appendChild(bar);
+    bar.style = 'display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#333; color:white; padding:10px 20px; border-radius:5px; font-size:0.9em; z-index:1000;';
+    document.body.appendChild(bar);
   }
   bar.textContent = msg;
   bar.style.display = 'block';
