@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "UFO-grottan i Aspberget",
+    "lat": 60.37551,
+    "lng": 16.02445,
+    "visited": false,
+    "location": "Aspberget, Hedemora",
+    "description": "Tips om en sprickgrotta i Aspberget, 12 km N Hedemora."
+  },
+  {
+    "id": 2,
+    "name": "Grottan i Humboberget",
+    "lat": 60.2152,
+    "lng": 15.4600,
+    "visited": false,
+    "location": "Humboberget, Norrbärke Kyrka",
+    "description": "Berget innehåller gamla gruvhål. 'Grottan' är en naturlig del av bergsformationen."
+  },
+  {
+    "id": 3,
+    "name": "Skelettgrottan",
+    "lat": 60.3100,
+    "lng": 15.0000,
+    "visited": false,
+    "location": "Pershyttan och Nordansjö, N om Hedemora",
+    "description": "En liten grotta med historia som är värd att utforska."
+  }
+]
