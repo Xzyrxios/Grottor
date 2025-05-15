@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The World's Best Cave Exploring App</title>
+  <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     body { margin: 0; font-family: sans-serif; }
@@ -45,6 +46,10 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+const defaultMarkers = [];  // Lägg till dina standardgrottor här om du vill
+
+let markers = JSON.parse(localStorage.getItem('markers')) || [...defaultMarkers];
+
 const map = L.map('map').setView([60.3755, 16.0244], 10);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
@@ -65,9 +70,8 @@ async function loadCavesFromGitHub() {
   }
 }
 
+// Ladda grottor EFTER att 'markers' är deklarerad
 loadCavesFromGitHub();
-
-let markers = JSON.parse(localStorage.getItem('markers')) || [...defaultMarkers];
 
 function resetMarkers() {
   if (!confirm('Vill du återställa dina besökta platser?\nSidan laddas om.')) return;
@@ -224,7 +228,6 @@ function showSnackbar(msg) {
   setTimeout(() => (bar.style.display = 'none'), 2000);
 }
 */
-
 </script>
 
 </body>
