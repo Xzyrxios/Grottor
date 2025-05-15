@@ -48,16 +48,25 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-const defaultMarkers = [
-  { id: 1, name: "UFO-grottan i Aspberget", lat: 60.37551, lng: 16.02445, visited: false, location: "Aspberget, Hedemora", description: "Tips om en sprickgrotta i Aspberget, 12 km N Hedemora och 2 km SO Husby kyrka. Grottan ligger troligen i bergets ostbrant.", history: "" },
-  { id: 2, name: "Grottan i Humboberget", lat: 60.2152, lng: 15.4600, visited: false, location: "I Humboberget drygt 3 km S om Norrbärke Kyrka", description: "Berget innehåller gamla gruvhål. 'Grottan' kanske är ett gammalt gruvhål?", history: "" },
-  { id: 3, name: "Skelettgrottan", lat: 60.3100, lng: 15.0000, visited: false, location: "Nära Pershyttan och Nordansjö, N om Hedemora", description: "", history: "" },
-  { id: 4, name: "Grottan i Flogberget", lat: 60.2440, lng: 15.1420, visited: false, location: "Vid sjön Plogen, 500 m N Flogbergsgruvorna, 3.5 km V Morgårdshammar", description: "", history: "" },
-  { id: 5, name: "Grottan i Ångermansboklinten", lat: 60.4950, lng: 15.6820, visited: false, location: "I berget väster om Ångermansbosjön", description: "\"I själva berget gömmer sig en grotta med släta och lodräta väggar\".", history: "" },
-  { id: 6, name: "Gunnars Hålorna", lat: 60.3180, lng: 15.7730, visited: false, location: "Södra sidan av Kälsjön, nära Kärrsjön och Kärrsjöberget", description: "De två hålorna eller grottorna finns i berget på södra sidan av Kälsjön - skall förmodligen vara den på kartan namngivna Kärrsjön och berget Kärrsjöberget.", history: "En gissning till namnet Gunnars hålorna är att det kommer från en fredlös man vid namn Gunnar som här sökt skydd undan sina förföljare." },
-  { id: 7, name: "Grottan i Helgeberget", lat: 60.3550, lng: 15.6600, visited: false, location: "Nära Västanberg (möjligen Hällbergsklack)", description: "Vid Helgebergets fot finns en djup grotta som går in under berget.", history: "" },
-  { id: 8, name: "Storpusskyrkan", lat: 60.3085, lng: 15.6200, visited: false, location: "Mellan Lövåsberget och Högsvedsberget, nära Arkhyttan", description: "Enligt RAA är detta ett 9 m långt flyttblock, 4 m högt, som vilar på ett mindre sprucket block. Under det stora blockets NO-del har ett rum i manshöjd bildats.", history: "" }
-];
+async function loadCavesFromGitHub() {
+  try {
+    const response = await fetch(
+      "https://raw.githubusercontent.com/Xzyrxios/Grottor/main/caves.json"
+    );
+    if (!response.ok) {
+      throw new Error(`Failed to fetch caves.json: ${response.status}`);
+    }
+    const caves = await response.json();
+    markers = caves;
+    applyFilter(); // Render the map and list with the new data
+    console.log("Caves loaded successfully:", markers);
+  } catch (error) {
+    console.error("Error loading caves:", error);
+  }
+}
+
+// Call the function to load caves
+loadCavesFromGitHub();
 let markers = JSON.parse(localStorage.getItem('markers')) || [...defaultMarkers];
 
 function resetMarkers() {
