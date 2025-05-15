@@ -52,5 +52,32 @@
     "visited": false,
     "location": "Enklaste vägen mot Jätturn är via väg 635 mellan Romme och Smedjebacken. Skogsbilvägarna närmast väg 50 är bommade året om.",
     "description": "Du tar dig in i området via Pollackssund. Sedan får du vandra ett stycke på Sméleden. Det är en trevlig vandringsled som börjar i Björsjö och går norrut, genom reservatet till Långsjön i Säters kommun. Runt Jätturn löper en märkt och delvis spångad led, som tar dig till sjöns västra strand. Startpunkten för denna trevliga runda är kolarkojan och den är drygt 1 km lång."
+  },
+  {
+    "id": 7,
+    "name": "Byggningsgrottorna",
+    "lat": 60.5000,
+    "lng": 15.2000,
+    "visited": false,
+    "location": "Sydost om Jälkarbyn, Dalarna",
+    "description": "En samling flyttblock som tillsammans bildar flera grottor i olika storlekar. Populärt utflyktsmål för barnfamiljer och nyfikna grottutforskare."
+  },
+  {
+    "id": 8,
+    "name": "Säljbergsgrottan",
+    "lat": 60.59708,
+    "lng": 14.45944,
+    "visited": false,
+    "location": "Säljberget, Noret, Dala-Järna",
+    "description": "En av Dalarnas största och vackraste grottor, även känd som 'Bergtrollshålet'. En fantasieggande vandring genom en imponerande grottformation."
+  },
+  {
+    "id": 9,
+    "name": "Grottan vid Ludvika",
+    "lat": 60.13216,
+    "lng": 15.18737,
+    "visited": false,
+    "location": "Nära Ludvika, Ludvika kommun",
+    "description": "En grotta belägen i närheten av Ludvika, tillagd i kategorin Grottor på Koordinater.se."
   }
 ]
