@@ -28,7 +28,9 @@
   <button onclick="centerOnUser()">Centrera på min plats</button>
   <button onclick="resetMarkers()">Återställ platser</button>
 </div>
+
 <br>
+
 <div style="padding: 0 1em 0em 1cm; max-width: 600px;">
   <label for="filter">Visa:
     <select id="filter" onchange="applyFilter()">
@@ -50,22 +52,21 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 async function loadCavesFromGitHub() {
   try {
-    const response = await fetch(
-      "https://raw.githubusercontent.com/Xzyrxios/Grottor/main/caves.json");
+    const response = await fetch("https://raw.githubusercontent.com/Xzyrxios/Grottor/main/caves.json");
     if (!response.ok) {
       throw new Error(`Failed to fetch caves.json: ${response.status}`);
     }
     const caves = await response.json();
     markers = caves;
-    applyFilter(); // Render the map and list with the new data
+    applyFilter();
     console.log("Caves loaded successfully:", markers);
   } catch (error) {
     console.error("Error loading caves:", error);
   }
 }
 
-// Call the function to load caves
 loadCavesFromGitHub();
+
 let markers = JSON.parse(localStorage.getItem('markers')) || [...defaultMarkers];
 
 function resetMarkers() {
@@ -90,45 +91,43 @@ function markVisited(id) {
 }
 
 function renderMarkers(filter = 'all') {
-  // Remove existing markers, except the user marker
   map.eachLayer(layer => {
     if (layer instanceof L.Marker && !layer._isUserMarker) {
       map.removeLayer(layer);
     }
   });
 
-  // Filter markers based on the filter option
   let filtered = markers;
   if (filter === 'visited') filtered = markers.filter(m => m.visited);
   if (filter === 'notvisited') filtered = markers.filter(m => !m.visited);
 
-  // Add filtered markers to the map
-filtered.forEach(m => {
-  const iconColor = m.visited ? 'green' : 'blue';
-  const marker = L.marker([m.lat, m.lng], {
-    icon: L.icon({
-      iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${iconColor}.png`,
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41]
-    })
-  }).addTo(map);
-  marker._isUserMarker = false;
-  const gmapsLink = `https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}`;
-  const popupHtml = `
-    <div class="popup-content">
-      <b>${m.name}</b><br/>
-      <small style='color: #555;'>${m.location || ''}</small><br/>
-      <p>${m.description || ''}</p>
-      ${m.history ? `<em>${m.history}</em><br/>` : ''}
-      <button onclick="markVisited(${m.id})" class="${m.visited ? 'visited' : ''}">
-        ${m.visited ? 'Besökt' : 'Markera som besökt'}</button><br/>
-      <a href="${gmapsLink}" target="_blank" class="navigate-link">Navigera till platsen</a>
-    </div>`;
-  marker.bindPopup(popupHtml);
-});
+  filtered.forEach(m => {
+    const iconColor = m.visited ? 'green' : 'blue';
+    const marker = L.marker([m.lat, m.lng], {
+      icon: L.icon({
+        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${iconColor}.png`,
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      })
+    }).addTo(map);
+    marker._isUserMarker = false;
+    const gmapsLink = `https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}`;
+    const popupHtml = `
+      <div class="popup-content">
+        <b>${m.name}</b><br/>
+        <small style='color: #555;'>${m.location || ''}</small><br/>
+        <p>${m.description || ''}</p>
+        ${m.history ? `<em>${m.history}</em><br/>` : ''}
+        <button onclick="markVisited(${m.id})" class="${m.visited ? 'visited' : ''}">
+          ${m.visited ? 'Besökt' : 'Markera som besökt'}</button><br/>
+        <a href="${gmapsLink}" target="_blank" class="navigate-link">Navigera till platsen</a>
+      </div>`;
+    marker.bindPopup(popupHtml);
+  });
+}
 
 function renderList(sortedMarkers) {
   const list = document.getElementById('marker-list');
@@ -208,24 +207,25 @@ if (navigator.geolocation) {
   applyFilter();
 }
 
+/*
 function showSnackbar(msg) {
   let bar = document.getElementById('snackbar');
   if (!bar) {
     bar = document.createElement('div');
     bar.id = 'snackbar';
-bar.style = 
-  'display:none; position:fixed; bottom:20px; left:50%;' +
-  'transform:translateX(-50%); background:#333; color:white;' +
-  'padding:10px 20px; border-radius:5px; font-size:0.9em; z-index:1000;';
+    bar.style =
+      'display:none; position:fixed; bottom:20px; left:50%;' +
+      'transform:translateX(-50%); background:#333; color:white;' +
+      'padding:10px 20px; border-radius:5px; font-size:0.9em; z-index:1000;';
     document.body.appendChild(bar);
   }
   bar.textContent = msg;
   bar.style.display = 'block';
   setTimeout(() => (bar.style.display = 'none'), 2000);
 }
-  
+*/
+
 </script>
 
 </body>
 </html>
-
