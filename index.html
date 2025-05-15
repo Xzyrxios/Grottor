@@ -218,8 +218,9 @@ function showSnackbar(msg) {
   }
   bar.textContent = msg;
   bar.style.display = 'block';
-  setTimeout(() => bar.style.display = 'none', 2000);
+  setTimeout(() => (bar.style.display = 'none'), 2000);
 }
+  
 </script>
 
 </body>
