@@ -81,7 +81,7 @@
     "description": "En grotta belägen i närheten av Ludvika, tillagd i kategorin Grottor på Koordinater.se."
   },
  {
-  "id": 12,
+  "id": 10,
   "name": "Blockrasgrottan vid Knutsboberget",
   "lat": 60.906735410654754,
   "lng": 15.543426688843757,
@@ -91,7 +91,7 @@
   "history": ""
  },
   {
-  "id": 14,  
+  "id": 11,  
   "name": "Gruvan i Vintjärn",
   "lat": 60.84720,
   "lng": 15.94241,
@@ -101,7 +101,7 @@
   "history": "Vintjärn var ett aktivt gruvsamhälle från 1700-talet och framåt. Gruvorna har sedan länge varit övergivna, men spåren finns kvar i landskapet."
  },
   {
-  "id": 15,
+  "id": 12,
   "name": "Storögrottorna",
   "lat": 60.50296,
   "lng": 15.59402,
