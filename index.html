@@ -61,20 +61,25 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 async function loadCavesFromGitHub() {
+  if (localStorage.getItem('markers')) {
+    console.log("Använder marker från localStorage – användarens ändringar bevaras.");
+    applyFilter();
+    return;
+  }
+
   try {
     const response = await fetch("https://raw.githubusercontent.com/Xzyrxios/Grottor/main/caves.json");
-    if (!response.ok) {
-      throw new Error(`Failed to fetch caves.json: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Misslyckades ladda caves.json: ${response.status}`);
+
     const caves = await response.json();
     markers = caves;
+    saveMarkers(); // 🧠 Spara till localStorage direkt
     applyFilter();
-    console.log("Caves loaded successfully:", markers);
+    console.log("Caves laddade från GitHub:", markers);
   } catch (error) {
-    console.error("Error loading caves:", error);
+    console.error("Fel vid laddning:", error);
   }
 }
-
 // Ladda grottor EFTER att 'markers' är deklarerad
 loadCavesFromGitHub();
 
