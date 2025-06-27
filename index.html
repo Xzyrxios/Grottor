@@ -15,11 +15,11 @@
     .navigate-link { display: inline-block; margin-top: 0.5em; color: #0645AD; text-decoration: underline; }
     #marker-list { padding: 0.5em 1em 1em 1cm; margin-left: 1cm; list-style-type: none; max-width: 600px; font-size: 0.95em; }
   </style>
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Grottor">
-<link rel="apple-touch-icon" href="icons/icon-192.png">  
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Grottor">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">  
 </head>
 <body>
 
@@ -51,9 +51,9 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const defaultMarkers = [];  // Lägg till dina standardgrottor här om du vill
-
+const defaultMarkers = [];
 let markers = JSON.parse(localStorage.getItem('markers')) || [...defaultMarkers];
+const markerMap = new Map();
 
 const map = L.map('map').setView([60.3755, 16.0244], 10);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -73,21 +73,19 @@ async function loadCavesFromGitHub() {
 
     const caves = await response.json();
     markers = caves;
-    saveMarkers(); // 🧠 Spara till localStorage direkt
+    saveMarkers();
     applyFilter();
     console.log("Caves laddade från GitHub:", markers);
   } catch (error) {
     console.error("Fel vid laddning:", error);
   }
 }
-// Ladda grottor EFTER att 'markers' är deklarerad
 loadCavesFromGitHub();
 
 function resetMarkers() {
   if (!confirm('Vill du återställa dina besökta platser?\nSidan laddas om.')) return;
   localStorage.removeItem('markers');
   document.getElementById('filter').value = 'all';
-  showSnackbar('Platser återställda');
   setTimeout(() => location.reload(), 1500);
 }
 
@@ -110,6 +108,7 @@ function renderMarkers(filter = 'all') {
       map.removeLayer(layer);
     }
   });
+  markerMap.clear();
 
   let filtered = markers;
   if (filter === 'visited') filtered = markers.filter(m => m.visited);
@@ -128,6 +127,8 @@ function renderMarkers(filter = 'all') {
       })
     }).addTo(map);
     marker._isUserMarker = false;
+    markerMap.set(m.id, marker);
+
     const gmapsLink = `https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}`;
     const popupHtml = `
       <div class="popup-content">
@@ -149,6 +150,7 @@ function renderList(sortedMarkers) {
   list.innerHTML = '';
   const distMap = Object.fromEntries(sortedMarkers.map(m => [m.id, m.dist || null]));
   const sorted = [...sortedMarkers].sort((a, b) => (a.dist || Infinity) - (b.dist || Infinity));
+
   sorted.forEach(m => {
     const dist = distMap[m.id];
     const li = document.createElement('li');
@@ -166,6 +168,9 @@ function renderList(sortedMarkers) {
       if (!isActive) {
         li.style.backgroundColor = 'lightyellow';
         map.setView([m.lat, m.lng], 14);
+        document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const marker = markerMap.get(m.id);
+        if (marker) marker.openPopup();
       }
     });
     list.appendChild(li);
@@ -179,7 +184,6 @@ function applyFilter() {
   if (filter === 'notvisited') filtered = markers.filter(m => !m.visited);
 
   let withDist = filtered.map(m => ({ ...m, dist: null }));
-
   if (window.__userLatLng) {
     const [userLat, userLng] = window.__userLatLng;
     withDist = filtered.map(m => {
@@ -220,24 +224,6 @@ if (navigator.geolocation) {
 } else {
   applyFilter();
 }
-
-/*
-function showSnackbar(msg) {
-  let bar = document.getElementById('snackbar');
-  if (!bar) {
-    bar = document.createElement('div');
-    bar.id = 'snackbar';
-    bar.style =
-      'display:none; position:fixed; bottom:20px; left:50%;' +
-      'transform:translateX(-50%); background:#333; color:white;' +
-      'padding:10px 20px; border-radius:5px; font-size:0.9em; z-index:1000;';
-    document.body.appendChild(bar);
-  }
-  bar.textContent = msg;
-  bar.style.display = 'block';
-  setTimeout(() => (bar.style.display = 'none'), 2000);
-}
-*/
 </script>
 
 </body>
