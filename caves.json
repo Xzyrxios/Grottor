@@ -79,5 +79,15 @@
     "visited": false,
     "location": "Nära Ludvika, Ludvika kommun",
     "description": "En grotta belägen i närheten av Ludvika, tillagd i kategorin Grottor på Koordinater.se."
-  }
+  },
+  {
+   "id": 12,
+   "name": "Grotta vid Knutsboberget",
+   "lat": 60.79214,
+   "lng": 15.14434,
+   "visited": false,
+   "location": "Ca 4 km söder om Dådran, nedanför stupet vid Knutsboberget",
+   "description": "Kring det stora pyramidformade blocket finns flera ingångar, den största i övre delen varifrån en stor kryp/gågång går rakt under blocket. Det finns flera gångar i olika nivåer. De har ställvis ståhöjd, ställvis är de trånga. djupast ner kommer man i östra delen av grottan. Terrängen är urskogslik med kraftig mossa och nedfallna träd.",
+   "history": ""
+ }
 ]
