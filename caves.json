@@ -99,5 +99,15 @@
   "location": "Vintjärn, nordost om Falun",
   "description": "En gammal gruva i Vintjärnsområdet, omgiven av historiska lämningar och djup skog.",
   "history": "Vintjärn var ett aktivt gruvsamhälle från 1700-talet och framåt. Gruvorna har sedan länge varit övergivna, men spåren finns kvar i landskapet."
+ },
+  {
+  "id": 15,
+  "name": "Storögrottorna",
+  "lat": 60.50296,
+  "lng": 15.59402,
+  "visited": false,
+  "location": "Storön, Ösjön, nära byn Kyna öster om Ornäs",
+  "description": "Blockanhopning med flertal klyftor, håligheter och blocköverhäng. Två grottor är kända, en större på 23 m och en mindre på 5 m.",
+  "history": "Labyrintliknande system med sidogångar, grottnivåer och avsatser. Den större grottans ingång är triangulär och 1.5 m hög, 1 m bred. Den andra har en smal öppning som sluttar brant ned i berget."
  }
 ]
